@@ -12,7 +12,11 @@ It has been validated with a recent ubuntu image in a non-production context.
 - **vcpus**: Number of virtual cores to assign to the vm
 - **memory**: Amount of memory to assign to the vms in MiBs
 - **volume_id**: Id of the volume to attach to the vm
-- **libvirt_network**: If the vm is to connect to a libvirt network, parameters of the connection. This is an object containing the following properties: network_id, ip, mac
+- **libvirt_network**: Parameters to connect to a libvirt network if you opt for that instead of macvtap interfaces. In has the following keys:
+  - **ip**: Ip of the vm.
+  - **mac**: Mac address of the vm. If none is passed, a random one will be generated.
+  - **network_id**: Id (ie, uuid) of the libvirt network to connect to (in which case **network_name** should be an empty string).
+  - **network_name**: Name of the libvirt network to connect to (in which case **network_id** should be an empty string).
 - **macvtap_interfaces**: List of macvtap interfaces to define for the vm. This is mutually exclusive with **libvirt_network**. Each entry in the list is an object with the following properties: interface, prefix_length, ip, mac, gateway, dns_servers
 - **cloud_init_volume_pool**: Volume pool to use for the generate cloud init volume
 - **cloud_init_volume_name**: Name of the generated cloud-init volume. If left empty, it will default to ```<name>-cloud-init.iso```.

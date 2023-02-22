@@ -1,4 +1,3 @@
-
 version: 2
 renderer: networkd
 ethernets:
@@ -9,7 +8,9 @@ ethernets:
       macaddress: ${val.mac}
     addresses:
       - ${val.ip}/${val.prefix_length}
+%{ if val.gateway != "" ~}
     gateway4: ${val.gateway}
+%{ endif ~}
 %{ if length(val.dns_servers) > 0 ~}
     nameservers:
       addresses: [${join(",", val.dns_servers)}]
