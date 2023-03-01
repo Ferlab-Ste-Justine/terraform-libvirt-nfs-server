@@ -36,7 +36,6 @@ variable "libvirt_network" {
   }
 }
 
-
 variable "macvtap_interfaces" {
   description = "List of macvtap interfaces. Mutually exclusive with the libvirt_network Field. Each entry has the following keys: interface, prefix_length, ip, mac, gateway and dns_servers"
   type        = list(object({
@@ -60,7 +59,6 @@ variable "cloud_init_volume_name" {
   type        = string
   default = ""
 }
-
 
 variable "ssh_admin_user" { 
   description = "Pre-existing ssh admin user of the image"
@@ -89,13 +87,61 @@ variable "nfs_configs" {
   description = "List of nfs configurations containing a subset of possible nfs configurations. It is a list of objects, each entry containing the following fields: path, domain, rw (true or false), sync (true or false), subtree_check (true or false), no_root_squash (true or false)"
   type        = list(object({
     path = string
-    domain = string
     rw = bool
     sync = bool
     subtree_check = bool
     no_root_squash = bool
   }))
   default = []
+}
+
+variable "nfs_tunnel" {
+  description = "Configuration for the nfs tunnel over tls"
+  type        = object({
+    listening_port     = string,
+    server_key         = string,
+    server_certificate = string,
+    ca_certificate     = string,
+    max_connections    = number,
+    idle_timeout       = string
+  })
+}
+
+variable "fluentd" {
+  description = "Fluentd configurations"
+  sensitive   = true
+  type = object({
+    enabled = bool,
+    nfs_tunnel_server_tag = string,
+    node_exporter_tag = string,
+    forward = object({
+      domain = string,
+      port = number,
+      hostname = string,
+      shared_key = string,
+      ca_cert = string,
+    }),
+    buffer = object({
+      customized = bool,
+      custom_value = string,
+    })
+  })
+  default = {
+    enabled = false
+    nfs_tunnel_server_tag = ""
+    node_exporter_tag = ""
+    forward = {
+      domain = ""
+      port = 0
+      hostname = ""
+      shared_key = ""
+      ca_cert = ""
+    }
+    buffer = {
+      customized = false
+      custom_value = ""
+    }
+  }
 }
 
 variable "chrony" {
@@ -127,4 +173,10 @@ variable "chrony" {
       limit = 0
     }
   }
+}
+
+variable "install_dependencies" {
+  description = "Whether to install all dependencies in cloud-init"
+  type = bool
+  default = true
 }
