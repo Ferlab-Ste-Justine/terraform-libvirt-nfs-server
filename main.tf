@@ -39,6 +39,24 @@ module "nfs_server_configs" {
   }
 }
 
+module "s3_backups" {
+  source = "git::https://github.com/Ferlab-Ste-Justine/terraform-cloudinit-templates.git//s3-outgoing-syncs?ref=main"
+  object_store = {
+    url                    = var.s3_backups.url
+    region                 = var.s3_backups.region
+    access_key             = var.s3_backups.access_key
+    secret_key             = var.s3_backups.secret_key
+    server_side_encryption = var.s3_backups.server_side_encryption
+    ca_cert                = var.s3_backups.ca_cert
+  }
+  backup = {
+    calendar = var.s3_backups.calendar
+    bucket   = var.s3_backups.bucket
+    paths    = [for nfs_config in var.nfs_configs : nfs_config.path]
+  }
+  install_dependencies = var.install_dependencies
+}
+
 module "prometheus_node_exporter_configs" {
   source = "git::https://github.com/Ferlab-Ste-Justine/terraform-cloudinit-templates.git//prometheus-node-exporter?ref=main"
   install_dependencies = var.install_dependencies
@@ -59,7 +77,11 @@ module "fluentd_configs" {
   install_dependencies = var.install_dependencies
   fluentd = {
     docker_services = []
-    systemd_services = [
+    systemd_services = concat(var.s3_backups.enabled ? [{
+      tag     = var.fluentd.s3_backup_tag
+      service = "s3-outgoing-sync"
+    }] : [],
+    [
       {
         tag     = var.fluentd.nfs_tunnel_server_tag
         service = "nfs-tunnel-server"
@@ -68,7 +90,7 @@ module "fluentd_configs" {
         tag     = var.fluentd.node_exporter_tag
         service = "node-exporter"
       }
-    ]
+    ])
     forward = var.fluentd.forward,
     buffer = var.fluentd.buffer
   }
@@ -100,6 +122,11 @@ locals {
         content      = module.nfs_server_configs.configuration
       }
     ],
+    var.s3_backups.enabled ? [{
+      filename     = "s3_backups.cfg"
+      content_type = "text/cloud-config"
+      content      = module.s3_backups.configuration
+    }] : [],
     var.chrony.enabled ? [{
       filename     = "chrony.cfg"
       content_type = "text/cloud-config"

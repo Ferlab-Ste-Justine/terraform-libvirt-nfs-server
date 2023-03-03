@@ -97,6 +97,7 @@ variable "nfs_configs" {
 
 variable "nfs_tunnel" {
   description = "Configuration for the nfs tunnel over tls"
+  sensitive   = true
   type        = object({
     listening_port     = string,
     server_key         = string,
@@ -107,12 +108,40 @@ variable "nfs_tunnel" {
   })
 }
 
+variable "s3_backups" {
+  description = "Configuration to continuously backup the nfs paths in s3"
+  sensitive   = true
+  type        = object({
+    enabled                = bool
+    url                    = string
+    region                 = string
+    access_key             = string
+    secret_key             = string
+    server_side_encryption = string
+    calendar               = string
+    bucket                 = string
+    ca_cert                = string
+  })
+  default = {
+    enabled                = false
+    url                    = ""
+    region                 = ""
+    access_key             = ""
+    secret_key             = ""
+    server_side_encryption = ""
+    calendar               = ""
+    bucket                 = ""
+    ca_cert                = ""
+  }
+}
+
 variable "fluentd" {
   description = "Fluentd configurations"
   sensitive   = true
   type = object({
     enabled = bool,
     nfs_tunnel_server_tag = string,
+    s3_backup_tag = string,
     node_exporter_tag = string,
     forward = object({
       domain = string,
@@ -129,6 +158,7 @@ variable "fluentd" {
   default = {
     enabled = false
     nfs_tunnel_server_tag = ""
+    s3_backup_tag = ""
     node_exporter_tag = ""
     forward = {
       domain = ""

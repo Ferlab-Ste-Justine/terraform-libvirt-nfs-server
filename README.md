@@ -33,9 +33,20 @@ The client is expected to implement its end of the tunnel. A validated reference
   - **max_connections**: Max number of connections that will be accepted
   - **idle_timeout**: Amount of time a connection with no traffic will be allowed to live before it is forcefully terminated.
 - **nfs_configs**: List of nfs directory entries. Each entry is an object containing the following properties: path (string), rw (bool), sync (bool), subtree_check (bool), no_root_squash (bool)
+- **s3_backups**: Configuration to continuously synchronize the directories exposed by the nfs server on an s3-compatible object store bucket. It has the following keys:
+  - **enabled**: Whether enable to s3 backups.
+  - **url**: Url of the s3-compatible object store
+  - **region**: Region to use in the object store
+  - **access_key**: User id for the object store
+  - **secret_key**: User password for the object store
+  - **server_side_encryption**: Encryption format (ex: **aws:kms**) of the s3 bucket if any. An empty string can be passed if the bucket is not encrypted. It will be passed to the **server_side_encryption** property in rclone's configuration.
+  - **calendar**: Frequency of the backup synchronization, in systemd time format (see: https://www.freedesktop.org/software/systemd/man/systemd.time.html#)
+  - **bucket**: Bucket to backup the filesystem info. 
+  - **ca_cert**: Optional CA certificate to use to authentify the object store's server certificate. Can be left empty if the object store doesn't use https or has a server certificate that is signed by a CA already in the vm's system.
 - **fluentd**: Optional fluend configuration to securely route logs to a fluentd node using the forward plugin. It has the following keys:
   - **enabled**: If set the false (the default), fluentd will not be installed.
   - **nfs_tunnel_server_tag**: Tag to assign to logs coming from the nfs tunnel server
+  - **s3_backup_tag**: Tag to assign to logs coming from the s3 backup service, if it is enabled
   - **node_exporter_tag** Tag to assign to logs coming from the prometheus node exporter
   - **forward**: Configuration for the forward plugin that will talk to the external fluend node. It has the following keys:
     - **domain**: Ip or domain name of the remote fluend node.
