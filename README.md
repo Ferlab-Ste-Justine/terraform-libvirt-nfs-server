@@ -6,6 +6,8 @@ This server provisions an envoy tunnel that accepts tls traffic with mutual cert
 
 The client is expected to implement its end of the tunnel. A validated reference implementation for the client in cloud-init format can be found here: https://github.com/Ferlab-Ste-Justine/terraform-cloudinit-templates/tree/main/nfs-client
 
+Optional recurring synchronization against a backup s3-compatible object store is also supported.
+
 # Usage
 
 ## Variables
