@@ -37,6 +37,7 @@ Optional recurring synchronization against a backup s3-compatible object store i
 - **nfs_configs**: List of nfs directory entries. Each entry is an object containing the following properties: path (string), rw (bool), sync (bool), subtree_check (bool), no_root_squash (bool)
 - **s3_backups**: Configuration to continuously synchronize the directories exposed by the nfs server on an s3-compatible object store bucket. It has the following keys:
   - **enabled**: Whether enable to s3 backups.
+  - **restore**: If set to true, an incoming synchronization will be done once from the backups when the vm is created, and before backups are started, to populate the nfs directories with backed up data.
   - **url**: Url of the s3-compatible object store
   - **region**: Region to use in the object store
   - **access_key**: User id for the object store

@@ -40,7 +40,7 @@ module "nfs_server_configs" {
 }
 
 module "s3_backups" {
-  source = "git::https://github.com/Ferlab-Ste-Justine/terraform-cloudinit-templates.git//s3-outgoing-syncs?ref=main"
+  source = "git::https://github.com/Ferlab-Ste-Justine/terraform-cloudinit-templates.git//s3-syncs?ref=main"
   object_store = {
     url                    = var.s3_backups.url
     region                 = var.s3_backups.region
@@ -49,10 +49,16 @@ module "s3_backups" {
     server_side_encryption = var.s3_backups.server_side_encryption
     ca_cert                = var.s3_backups.ca_cert
   }
-  backup = {
-    calendar = var.s3_backups.calendar
-    bucket   = var.s3_backups.bucket
-    paths    = [for nfs_config in var.nfs_configs : nfs_config.path]
+  outgoing_sync = {
+    calendar   = var.s3_backups.calendar
+    bucket     = var.s3_backups.bucket
+    paths      = [for nfs_config in var.nfs_configs : nfs_config.path]
+  }
+  incoming_sync = {
+    sync_once  = true
+    calendar   = var.s3_backups.calendar
+    bucket     = var.s3_backups.bucket
+    paths      = var.s3_backups.restore ? [for nfs_config in var.nfs_configs : nfs_config.path] : []
   }
   install_dependencies = var.install_dependencies
 }

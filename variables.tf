@@ -113,6 +113,7 @@ variable "s3_backups" {
   sensitive   = true
   type        = object({
     enabled                = bool
+    restore                = bool
     url                    = string
     region                 = string
     access_key             = string
@@ -124,6 +125,7 @@ variable "s3_backups" {
   })
   default = {
     enabled                = false
+    restore                = false
     url                    = ""
     region                 = ""
     access_key             = ""
