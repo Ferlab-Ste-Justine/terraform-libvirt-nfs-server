@@ -86,6 +86,9 @@ module "fluentd_configs" {
     systemd_services = concat(var.s3_backups.enabled ? [{
       tag     = var.fluentd.s3_backup_tag
       service = "s3-outgoing-sync"
+    }, {
+      tag     = var.fluentd.s3_restore_tag
+      service = "s3-incoming-sync"
     }] : [],
     [
       {

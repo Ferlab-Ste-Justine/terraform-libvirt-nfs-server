@@ -99,11 +99,11 @@ variable "nfs_tunnel" {
   description = "Configuration for the nfs tunnel over tls"
   sensitive   = true
   type        = object({
-    listening_port     = string,
-    server_key         = string,
-    server_certificate = string,
-    ca_certificate     = string,
-    max_connections    = number,
+    listening_port     = string
+    server_key         = string
+    server_certificate = string
+    ca_certificate     = string
+    max_connections    = number
     idle_timeout       = string
   })
 }
@@ -141,26 +141,28 @@ variable "fluentd" {
   description = "Fluentd configurations"
   sensitive   = true
   type = object({
-    enabled = bool,
-    nfs_tunnel_server_tag = string,
-    s3_backup_tag = string,
-    node_exporter_tag = string,
+    enabled = bool
+    nfs_tunnel_server_tag = string
+    s3_backup_tag = string
+    s3_restore_tag = string
+    node_exporter_tag = string
     forward = object({
-      domain = string,
-      port = number,
-      hostname = string,
-      shared_key = string,
-      ca_cert = string,
+      domain = string
+      port = number
+      hostname = string
+      shared_key = string
+      ca_cert = string
     }),
     buffer = object({
-      customized = bool,
-      custom_value = string,
+      customized = bool
+      custom_value = string
     })
   })
   default = {
     enabled = false
     nfs_tunnel_server_tag = ""
     s3_backup_tag = ""
+    s3_restore_tag = ""
     node_exporter_tag = ""
     forward = {
       domain = ""
@@ -179,20 +181,20 @@ variable "fluentd" {
 variable "chrony" {
   description = "Chrony configuration for ntp. If enabled, chrony is installed and configured, else the default image ntp settings are kept"
   type        = object({
-    enabled = bool,
+    enabled = bool
     //https://chrony.tuxfamily.org/doc/4.2/chrony.conf.html#server
     servers = list(object({
       url = string,
       options = list(string)
-    })),
+    }))
     //https://chrony.tuxfamily.org/doc/4.2/chrony.conf.html#pool
     pools = list(object({
       url = string,
       options = list(string)
-    })),
+    }))
     //https://chrony.tuxfamily.org/doc/4.2/chrony.conf.html#makestep
     makestep = object({
-      threshold = number,
+      threshold = number
       limit = number
     })
   })
@@ -201,7 +203,7 @@ variable "chrony" {
     servers = []
     pools = []
     makestep = {
-      threshold = 0,
+      threshold = 0
       limit = 0
     }
   }
