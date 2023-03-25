@@ -106,7 +106,7 @@ resource "tls_locally_signed_cert" "nfs_tunnel_server_certificate" {
 }
 
 module "nfs_server" {
-  source = "git::https://github.com/Ferlab-Ste-Justine/kvm-nfs-server.git"
+  source = "git::https://github.com/Ferlab-Ste-Justine/terraform-libvirt-nfs-server.git"
   name = "ferlab-nfs"
   vcpus = local.params.nfs.vcpus
   memory = local.params.nfs.memory
