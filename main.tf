@@ -15,7 +15,7 @@ locals {
     mac = macvtap_interface.mac
     hostname = null
   }]
-  volumes = var.data_volume_id != "" ? [var.volume_id, var.data_volume_id] : [var.volume_id]
+  volumes = var.data_volume.id != "" ? [var.volume_id, var.data_volume.id] : [var.volume_id]
 }
 
 module "network_configs" {
@@ -160,7 +160,7 @@ locals {
       content_type = "text/cloud-config"
       content      = module.fluentd_configs.configuration
     }] : [],
-    var.data_volume_id != "" ? [{
+    var.data_volume.id != "" ? [{
       filename     = "data_volume.cfg"
       content_type = "text/cloud-config"
       content      = module.data_volume_configs.configuration
@@ -198,8 +198,11 @@ resource "libvirt_domain" "nfs_server" {
   vcpu = var.vcpus
   memory = var.memory
 
-  disk {
-    volume_id = var.volume_id
+  dynamic "disk" {
+    for_each = local.volumes
+    content {
+      volume_id = disk.value
+    }
   }
 
   dynamic "network_interface" {

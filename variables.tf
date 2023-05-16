@@ -20,10 +20,16 @@ variable "volume_id" {
   type        = string
 }
 
-variable "data_volume_id" {
-  description = "Id for an optional separate disk volume to attach to the vm on nfs' data path"
-  type        = string
-  default     = ""
+variable "data_volume" {
+  description = "Id and path for an optional separate disk volume to attach to the vm on nfs' data path"
+  type = object({
+    id = string
+    path = string
+  })
+  default = {
+    id = ""
+    path = ""
+  }
 }
 
 variable "libvirt_network" {
