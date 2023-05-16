@@ -16,7 +16,9 @@ Optional recurring synchronization against a backup s3-compatible object store i
 - **vcpus**: Number of virtual cores to assign to the vm
 - **memory**: Amount of memory to assign to the vms in MiBs
 - **volume_id**: Id of the volume to attach to the vm
-- **data_volume_id**: Id for an optional separate disk volume to attach to the vm on nfs' data path
+- **data_volume**: Optional variable to separate disk volume to attach to the vm on nfs' data path
+  - **id**: Id for an optional separate disk volume.
+  - **path**: Path for an optional separate disk volume.
 - **libvirt_network**: Parameters to connect to a libvirt network if you opt for that instead of macvtap interfaces. In has the following keys:
   - **ip**: Ip of the vm.
   - **mac**: Mac address of the vm. If none is passed, a random one will be generated.
