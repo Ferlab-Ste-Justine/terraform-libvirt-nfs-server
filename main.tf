@@ -15,6 +15,7 @@ locals {
     mac = macvtap_interface.mac
     hostname = null
   }]
+  volumes = var.data_volume_id != "" ? [var.volume_id, var.data_volume_id] : [var.volume_id]
 }
 
 module "network_configs" {
@@ -107,6 +108,17 @@ module "fluentd_configs" {
   }
 }
 
+module "data_volume_configs" {
+  source = "git::https://github.com/Ferlab-Ste-Justine/terraform-cloudinit-templates.git//data-volumes?ref=main"
+  volumes = [{
+    label         = "etcd_data"
+    device        = "vdb"
+    filesystem    = "ext4"
+    mount_path    = "/var/lib/etcd"
+    mount_options = "defaults"
+  }]
+}
+
 locals {
   cloudinit_templates = concat([
       {
@@ -148,6 +160,11 @@ locals {
       content_type = "text/cloud-config"
       content      = module.fluentd_configs.configuration
     }] : [],
+    var.data_volume_id != "" ? [{
+      filename     = "data_volume.cfg"
+      content_type = "text/cloud-config"
+      content      = module.data_volume_configs.configuration
+    }]: []
   )
 }
 
