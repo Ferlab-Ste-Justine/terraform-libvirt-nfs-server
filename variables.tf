@@ -24,11 +24,11 @@ variable "data_volume" {
   description = "Id and path for an optional separate disk volume to attach to the vm on nfs' data path"
   type = object({
     id = string
-    path = string
+    mount_path = string
   })
   default = {
     id = ""
-    path = ""
+    mount_path = ""
   }
 }
 

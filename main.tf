@@ -114,7 +114,7 @@ module "data_volume_configs" {
     label         = "nfs_data"
     device        = "vdb"
     filesystem    = "ext4"
-    mount_path    = "/var/lib/nfs"
+    mount_path    = var.data_volume.mount_path
     mount_options = "defaults"
   }]
 }
