@@ -109,7 +109,7 @@ module "fluentd_configs" {
 }
 
 module "data_volume_configs" {
-  source = "git::https://github.com/Ferlab-Ste-Justine/terraform-cloudinit-templates.git//data-volumes?ref=main"
+  source = "git::https://github.com/Ferlab-Ste-Justine/terraform-cloudinit-templates.git//data-volumes?ref=v0.3.0"
   volumes = [{
     label         = "nfs_data"
     device        = "vdb"
