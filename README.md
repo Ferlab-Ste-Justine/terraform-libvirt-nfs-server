@@ -19,12 +19,21 @@ Optional recurring synchronization against a backup s3-compatible object store i
 - **data_volume**: Optional variable to separate disk volume to attach to the vm on nfs' data path
   - **id**: Id for an optional separate disk volume.
   - **path**: Path for an optional separate disk volume.
-- **libvirt_network**: Parameters to connect to a libvirt network if you opt for that instead of macvtap interfaces. In has the following keys:
-  - **ip**: Ip of the vm.
-  - **mac**: Mac address of the vm. If none is passed, a random one will be generated.
+- **libvirt_network**: Parameters to connect to libvirt networks. Each entry has the following keys:
   - **network_id**: Id (ie, uuid) of the libvirt network to connect to (in which case **network_name** should be an empty string).
   - **network_name**: Name of the libvirt network to connect to (in which case **network_id** should be an empty string).
-- **macvtap_interfaces**: List of macvtap interfaces to define for the vm. This is mutually exclusive with **libvirt_network**. Each entry in the list is an object with the following properties: interface, prefix_length, ip, mac, gateway, dns_servers
+  - **ip**: Ip of interface connecting to the libvirt network.
+  - **mac**: Mac address of interface connecting to the libvirt network.
+  - **prefix_length**:  Length of the network prefix for the network the interface will be connected to. For a **192.168.1.0/24** for example, this would be **24**.
+  - **gateway**: Ip of the network's gateway. Usually the gateway the first assignable address of a libvirt's network.
+  - **dns_servers**: Dns servers to use. Usually the dns server is first assignable address of a libvirt's network.
+- **macvtap_interfaces**: List of macvtap interfaces to connect the vm to if you opt for macvtap interfaces. Each entry in the list is a map with the following keys:
+  - **interface**: Host network interface that you plan to connect your macvtap interface with.
+  - **prefix_length**: Length of the network prefix for the network the interface will be connected to. For a **192.168.1.0/24** for example, this would be 24.
+  - **ip**: Ip associated with the macvtap interface. 
+  - **mac**: Mac address associated with the macvtap interface
+  - **gateway**: Ip of the network's gateway for the network the interface will be connected to.
+  - **dns_servers**: Dns servers for the network the interface will be connected to. If there aren't dns servers setup for the network your vm will connect to, the ip of external dns servers accessible accessible from the network will work as well.
 - **cloud_init_volume_pool**: Volume pool to use for the generate cloud init volume
 - **cloud_init_volume_name**: Name of the generated cloud-init volume. If left empty, it will default to ```<name>-cloud-init.iso```.
 - **ssh_admin_user**: Username of the default sudo user in the image. Defaults to **ubuntu**.
@@ -114,12 +123,15 @@ module "nfs_server" {
   vcpus = local.params.nfs.vcpus
   memory = local.params.nfs.memory
   volume_id = libvirt_volume.nfs.id
-  libvirt_network = {
+  libvirt_networks = [{
     network_name = "ferlab"
     network_id = ""
     ip = data.netaddr_address_ipv4.nfs.address
     mac = data.netaddr_address_mac.nfs.address
-  }
+    gateway = local.params.network.gateway
+    dns_servers = [local.params.network.dns]
+    prefix_length = split("/", local.params.network.addresses).1
+  }]
   cloud_init_volume_pool = "default"
   ssh_admin_public_key = tls_private_key.admin_ssh.public_key_openssh
   admin_user_password = local.params.virsh_console_password

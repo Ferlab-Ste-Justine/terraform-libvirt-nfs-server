@@ -32,31 +32,29 @@ variable "data_volume" {
   }
 }
 
-variable "libvirt_network" {
-  description = "Parameters of the libvirt network connection if a libvirt network is used. Has the following parameters: network_id, ip, mac"
-  type = object({
+variable "libvirt_networks" {
+  description = "Parameters of libvirt network connections if a libvirt networks are used."
+  type = list(object({
     network_name = string
     network_id = string
-    ip = string
-    mac = string
-  })
-  default = {
-    network_name = ""
-    network_id = ""
-    ip = ""
-    mac = ""
-  }
-}
-
-variable "macvtap_interfaces" {
-  description = "List of macvtap interfaces. Mutually exclusive with the libvirt_network Field. Each entry has the following keys: interface, prefix_length, ip, mac, gateway and dns_servers"
-  type        = list(object({
-    interface = string
     prefix_length = string
     ip = string
     mac = string
     gateway = string
     dns_servers = list(string)
+  }))
+  default = []
+}
+
+variable "macvtap_interfaces" {
+  description = "List of macvtap interfaces."
+  type        = list(object({
+    interface     = string
+    prefix_length = string
+    ip            = string
+    mac           = string
+    gateway       = string
+    dns_servers   = list(string)
   }))
   default = []
 }
