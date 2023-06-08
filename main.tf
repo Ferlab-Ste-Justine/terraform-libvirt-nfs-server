@@ -101,31 +101,34 @@ module "chrony_configs" {
   }
 }
 
-module "fluentd_configs" {
-  source = "git::https://github.com/Ferlab-Ste-Justine/terraform-cloudinit-templates.git//fluentd?ref=v0.8.0"
+module "fluentbit_configs" {
+  source = "git::https://github.com/Ferlab-Ste-Justine/terraform-cloudinit-templates.git//fluent-bit?ref=v0.8.0"
   install_dependencies = var.install_dependencies
-  fluentd = {
-    docker_services = []
-    systemd_services = concat(var.s3_backups.enabled ? [{
-      tag     = var.fluentd.s3_backup_tag
-      service = "s3-outgoing-sync"
-    }, {
-      tag     = var.fluentd.s3_restore_tag
-      service = "s3-incoming-sync"
-    }] : [],
+  fluentbit = {
+    metrics = var.fluentbit.metrics
+    systemd_services = concat(var.s3_backups.enabled ? [
+      {
+        tag     = var.fluentbit.s3_backup_tag
+        service = "s3-outgoing-sync.service"
+      }, 
+      {
+        tag     = var.fluentbit.s3_restore_tag
+        service = "s3-incoming-sync.service"
+      }
+    ] : [],
     [
       {
-        tag     = var.fluentd.nfs_tunnel_server_tag
-        service = "nfs-tunnel-server"
+        tag     = var.fluentbit.nfs_tunnel_server_tag
+        service = "nfs-tunnel-server.service"
       },
       {
-        tag     = var.fluentd.node_exporter_tag
-        service = "node-exporter"
+        tag     = var.fluentbit.node_exporter_tag
+        service = "node-exporter.service"
       }
     ])
-    forward = var.fluentd.forward,
-    buffer = var.fluentd.buffer
+    forward = var.fluentbit.forward
   }
+  etcd    = var.fluentbit.etcd
 }
 
 module "data_volume_configs" {
@@ -175,10 +178,10 @@ locals {
       content_type = "text/cloud-config"
       content      = module.chrony_configs.configuration
     }] : [],
-    var.fluentd.enabled ? [{
-      filename     = "fluentd.cfg"
+    var.fluentbit.enabled ? [{
+      filename     = "fluent_bit.cfg"
       content_type = "text/cloud-config"
-      content      = module.fluentd_configs.configuration
+      content      = module.fluentbit_configs.configuration
     }] : [],
     var.data_volume.id != "" ? [{
       filename     = "data_volume.cfg"
